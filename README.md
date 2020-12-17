@@ -130,7 +130,7 @@ dynamic.beetlsql.cs.dynamicConnectionSource = ds1,ds2
     }
 ```
 
-5. 多租户配置
+5. 多租户配置(独立DB方式)
 推荐使用 ConditionalConnectionSource 模式，配合 dynamic-datasource 的 注解，如：
 (以下约定 tenantId 同 Datasource 名称)
 
