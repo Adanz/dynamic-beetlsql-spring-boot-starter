@@ -175,7 +175,7 @@ public class BeetlSqlBeanRegister implements ImportBeanDefinitionRegistrar, Reso
 		scanner.setSqlManagerFactoryBeanName(name);
 		scanner.setSuffix(property.getDaoSuffix());
 		scanner.registerFilters();
-		scanner.scan(property.getBasePackage());
+		scanner.scan(property.getBasePackage().split(","));
 		return bdb;
 	}
 

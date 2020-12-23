@@ -21,7 +21,7 @@
 
 dynamic-beetlsql-spring-boot-starter 的主要功能是整合 [dynamic-datasource-spring-boot-starter](https://gitee.com/baomidou/dynamic-datasource-spring-boot-starter) 和 [BeetlSQL](https://gitee.com/xiandafu/beetlsql), 方便配置和使用多数据源。
 
-其支持 **Jdk 1.8+,SpringBoot 2.x.x, dynamic-datasource-spring-boot-starter 3.xx, beetlSQL 3.xx**。
+支持 **Jdk 1.8+,SpringBoot 2.x.x, dynamic-datasource-spring-boot-starter 3.xx, beetlSQL 3.xx**。
 
 # 特性
 
@@ -40,7 +40,7 @@ dynamic-beetlsql-spring-boot-starter 的主要功能是整合 [dynamic-datasourc
 <dependency>
   <groupId>com.qeedata</groupId>
   <artifactId>dynamic-beetlsql-spring-boot-starter</artifactId>
-  <version>0.9.3</version>
+  <version>0.9.5</version>
 </dependency>
 ```
 2. 配置数据源。
