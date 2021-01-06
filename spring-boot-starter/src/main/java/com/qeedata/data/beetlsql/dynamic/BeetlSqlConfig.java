@@ -4,6 +4,7 @@ import lombok.Data;
 import org.beetl.sql.clazz.kit.StringKit;
 import org.springframework.core.env.Environment;
 
+import java.nio.charset.Charset;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +25,7 @@ public class BeetlSqlConfig {
     public static String PREFIX_BASE_PACKAGE = ".basePackage";
     public static String PREFIX_DAO_SUFFIX = ".daoSuffix";
     public static String PREFIX_SQL_PATH = ".sqlPath";
+    public static String PREFIX_SQL_FILE_CHARSET = ".sqlFileCharset";
     public static String PREFIX_NAME_CONVERSION = ".nameConversion";
     public static String PREFIX_DB_STYLE = ".dbStyle";
     public static String PREFIX_DEV = ".dev";
@@ -73,6 +75,7 @@ public class BeetlSqlConfig {
         property.setBasePackage(env.getProperty(prefix + PREFIX_BASE_PACKAGE, "com"));
         property.setDaoSuffix(env.getProperty(prefix + PREFIX_DAO_SUFFIX, "Mapper"));
         property.setSqlPath(env.getProperty(prefix + PREFIX_SQL_PATH, "sql"));
+        property.setSqlFileCharset(env.getProperty(prefix + PREFIX_SQL_FILE_CHARSET, Charset.defaultCharset().name()));
         property.setNameConversion(env.getProperty(prefix + PREFIX_NAME_CONVERSION, "org.beetl.sql.core.UnderlinedNameConversion"));
         property.setDbStyle(env.getProperty(prefix + PREFIX_DB_STYLE, "org.beetl.sql.core.db.MySqlStyle"));
         property.setDev(Boolean.parseBoolean(env.getProperty(prefix + PREFIX_DEV, "true")));
@@ -93,6 +96,7 @@ public class BeetlSqlConfig {
         String basePackage = getProperty(property.getBasePackage(), defaultProperty.getBasePackage());
         String daoSuffix = getProperty(property.getDaoSuffix(), defaultProperty.getDaoSuffix());
         String sqlPath = getProperty(property.getSqlPath(), defaultProperty.getSqlPath());
+        String sqlFileCharset = getProperty(property.getSqlFileCharset(), defaultProperty.getSqlFileCharset());
         String nameConversion = getProperty(property.getNameConversion(), defaultProperty.getNameConversion());
         String dbStyle = getProperty(property.getDbStyle(), defaultProperty.getDbStyle());
         String slave = getProperty(property.getSlave(), defaultProperty.getSlave());
@@ -111,6 +115,7 @@ public class BeetlSqlConfig {
         prop.setBasePackage(basePackage);
         prop.setDaoSuffix(daoSuffix);
         prop.setSqlPath(sqlPath);
+        prop.setSqlFileCharset(sqlFileCharset);
         prop.setNameConversion(nameConversion);
         prop.setDbStyle(dbStyle);
         prop.setSlave(slave);

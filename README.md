@@ -40,7 +40,7 @@ dynamic-beetlsql-spring-boot-starter 的主要功能是整合 [dynamic-datasourc
 <dependency>
   <groupId>com.qeedata</groupId>
   <artifactId>dynamic-beetlsql-spring-boot-starter</artifactId>
-  <version>0.9.5</version>
+  <version>0.9.6</version>
 </dependency>
 ```
 2. 配置数据源。

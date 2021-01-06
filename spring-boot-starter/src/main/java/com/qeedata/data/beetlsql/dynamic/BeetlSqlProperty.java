@@ -2,6 +2,8 @@ package com.qeedata.data.beetlsql.dynamic;
 
 import lombok.Data;
 
+import java.nio.charset.Charset;
+
 /**
  * BeetlSql 配置属性
  * @author adanz
@@ -21,6 +23,10 @@ public class BeetlSqlProperty {
    * 存放sql文件的根目录
    */
   private String sqlPath = "sql";
+  /**
+   * 文件的字符集
+   */
+  String sqlFileCharset = Charset.defaultCharset().name();
   /**
    * 数据库和javapojo的映射关系
    */

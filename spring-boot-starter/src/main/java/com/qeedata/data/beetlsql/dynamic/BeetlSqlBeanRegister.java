@@ -144,7 +144,7 @@ public class BeetlSqlBeanRegister implements ImportBeanDefinitionRegistrar, Reso
 	private BeanDefinitionBuilder registerSQLManager(String name, BeetlSqlProperty property, ClassLoader classLoader, String csName) {
 		String beetlSqlSourceBeanName = csName + "BeetlSqlDataSourceBean";
 
-		MarkdownClasspathLoader loader = new MarkdownClasspathLoader(property.getSqlPath());
+		MarkdownClasspathLoader loader = new MarkdownClasspathLoader(property.getSqlPath(), property.getSqlFileCharset());
 		if (!registry.containsBeanDefinition(beetlSqlSourceBeanName)) {
 			BeanDefinitionBuilder sqlSourceBuilder = registerBeetlSqlSource(csName, property);
 			registry.registerBeanDefinition(beetlSqlSourceBeanName, sqlSourceBuilder.getBeanDefinition());
