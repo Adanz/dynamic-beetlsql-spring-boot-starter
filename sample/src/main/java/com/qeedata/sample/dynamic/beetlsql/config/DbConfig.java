@@ -49,4 +49,45 @@ public class DbConfig {
 			System.out.println("SQLManager customize:" + sqlManagerName);
 		}
 	}
+	
+	@Bean
+	public DynamicDatasourceConfigProvider dynamicDatasourceConfigProvider() {
+		return new DynamicDatasourceConfigProvider() {
+			@Override
+			public Map<String, DataSourceProperty> getDataSourcePropertyMap(SQLManager sqlManager, String param) {
+				Map<String, DataSourceProperty> map = new HashMap<>();
+
+				List<Map<String, Object>> rows = new ArrayList<>();
+				Map<String, Object> item = new HashMap<>();
+				item.put("name", "ds3");
+				item.put("username", "");
+				item.put("password", "");
+				item.put("url", "jdbc:mysql://localhost:3306/db3?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowMultiQueries=true");
+				item.put("driverClassName", "com.mysql.cj.jdbc.Driver");
+				rows.add(item);
+				item = new HashMap<>();
+				item.put("name", "ds4");
+				item.put("username", "");
+				item.put("password", "");
+				item.put("url", "jdbc:mysql://localhost:3306/db4?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowMultiQueries=true");
+				item.put("driverClassName", "com.mysql.cj.jdbc.Driver");
+				rows.add(item);
+
+				for (Map<String, Object> row: rows) {
+					String name = row.get("name").toString();
+					String username = row.get("username").toString();
+					String password = row.get("password").toString();
+					String url = row.get("url").toString();
+					String driver = row.get("driverClassName").toString();
+					DataSourceProperty property = new DataSourceProperty();
+					property.setUsername(username);
+					property.setPassword(password);
+					property.setUrl(url);
+					property.setDriverClassName(driver);
+					map.put(name, property);
+				}
+				return map;
+			}
+		};
+	}	
 }

@@ -1,5 +1,10 @@
 package com.qeedata.data.beetlsql.dynamic;
 
+import com.qeedata.data.beetlsql.dynamic.configure.BeetlSqlConfig;
+import com.qeedata.data.beetlsql.dynamic.configure.BeetlSqlProperty;
+import com.qeedata.data.beetlsql.dynamic.configure.DynamicBeetlSqlProperties;
+import com.qeedata.data.beetlsql.dynamic.ext.ConnectionSourceFactory;
+import com.qeedata.data.beetlsql.dynamic.ext.DynamicSqlManagerFactoryBean;
 import org.beetl.core.fun.ObjectUtil;
 import org.beetl.sql.core.Interceptor;
 import org.beetl.sql.core.loader.MarkdownClasspathLoader;
@@ -48,25 +53,24 @@ public class BeetlSqlBeanRegister implements ImportBeanDefinitionRegistrar, Reso
 		BeetlSqlBeanRegister.env = env;
 	}
 
-	public void registerBeetlSqlSourceBean(String source, BeetlSqlProperty property) {
+	public void registerBeetlSqlSourceBean(String source, String slaveSource) {
 		String beanName = source + "BeetlSqlDataSourceBean";
 		if (!registry.containsBeanDefinition(beanName)) {
-			BeanDefinitionBuilder sqlSourceBuilder = registerBeetlSqlSource(source, property);
+			BeanDefinitionBuilder sqlSourceBuilder = registerBeetlSqlSource(source, slaveSource);
 			registry.registerBeanDefinition(beanName, sqlSourceBuilder.getBeanDefinition());
 		}
 	}
 
-	private BeanDefinitionBuilder registerBeetlSqlSource(String name, BeetlSqlProperty property) {
-		String slave = property.getSlave();
+	private BeanDefinitionBuilder registerBeetlSqlSource(String source, String slaveSource) {
 		BeanDefinitionBuilder bdb = BeanDefinitionBuilder.rootBeanDefinition(ConnectionSourceFactory.class);
 
-		bdb.addPropertyValue("masterSource", name);
+		bdb.addPropertyValue("masterSource", source);
 
-		if(slave == null){
+		if(slaveSource == null){
 			return  bdb;
 		}
 
-		String[] slaveSources = slave.split(",");
+		String[] slaveSources = slaveSource.split(",");
 		bdb.addPropertyValue("slaveSource", slaveSources);
 		return bdb;
 	}
@@ -74,7 +78,8 @@ public class BeetlSqlBeanRegister implements ImportBeanDefinitionRegistrar, Reso
 	private void readySqlManager() {
 		final ClassLoader classLoader = getClassLoader();
 		beetlSqlPropertyMap.forEach((sqlManagerName, property) -> {
-			if (property.getDynamicConnectionSource() != null) {
+			if (property.getDynamicConnectionSource() != null ||
+					property.getDynamicDatasourceProvider() != null) {
 				// 支持 ConditionalConnectionSource  sqlManager
 				registerDynamicConnectionSourceSQLManager(sqlManagerName, property, classLoader);
 			} else if (property.getDynamicSqlManager() == null) {
@@ -117,7 +122,8 @@ public class BeetlSqlBeanRegister implements ImportBeanDefinitionRegistrar, Reso
 	 * ConditionalConnectionSource 方式，支持多数据库连接
 	 */
 	private void registerDynamicConnectionSourceSQLManager(String name, BeetlSqlProperty property, ClassLoader classLoader) {
-		String[] connectionSources = property.getDynamicConnectionSource().split(",");
+		String[] connectionSources = property.getDynamicConnectionSource() != null ?
+				property.getDynamicConnectionSource().split(",") : property.getDynamicDatasourceProvider().split(",");
 		registerSQLManager(name, property, classLoader, connectionSources[0]);
 		// connectionSources 在 DynamicBeetlSqlAutoConfiguration 中用
 		// setConditionalConnectionSource 设置
@@ -146,7 +152,7 @@ public class BeetlSqlBeanRegister implements ImportBeanDefinitionRegistrar, Reso
 
 		MarkdownClasspathLoader loader = new MarkdownClasspathLoader(property.getSqlPath(), property.getSqlFileCharset());
 		if (!registry.containsBeanDefinition(beetlSqlSourceBeanName)) {
-			BeanDefinitionBuilder sqlSourceBuilder = registerBeetlSqlSource(csName, property);
+			BeanDefinitionBuilder sqlSourceBuilder = registerBeetlSqlSource(csName, property.getSlave());
 			registry.registerBeanDefinition(beetlSqlSourceBeanName, sqlSourceBuilder.getBeanDefinition());
 		}
 		Properties ps = new Properties();

@@ -1,4 +1,4 @@
-package com.qeedata.data.beetlsql.dynamic;
+package com.qeedata.data.beetlsql.dynamic.configure;
 
 import lombok.Data;
 
@@ -60,7 +60,12 @@ public class BeetlSqlProperty {
   private  String dynamicSqlManager;
 
   /**
-   * dynamicSqlManager
+   * dynamicConnectionSource
    */
   private  String dynamicConnectionSource;
+
+  /**
+   * dynamicDataSourceProvider
+   */
+  private  String dynamicDatasourceProvider;
 }

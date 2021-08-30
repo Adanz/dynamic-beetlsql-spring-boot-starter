@@ -1,2 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.qeedata.data.beetlsql.dynamic.DynamicBeetlSqlAutoConfiguration
+com.qeedata.data.beetlsql.dynamic.configure.DynamicBeetlSqlAutoConfiguration

@@ -1,4 +1,4 @@
-package com.qeedata.data.beetlsql.dynamic;
+package com.qeedata.data.beetlsql.dynamic.ext;
 
 import org.beetl.core.fun.ObjectUtil;
 import org.beetl.sql.core.ConditionalSQLManager;

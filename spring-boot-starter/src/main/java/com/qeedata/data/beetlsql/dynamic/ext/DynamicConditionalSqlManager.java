@@ -1,4 +1,4 @@
-package com.qeedata.data.beetlsql.dynamic;
+package com.qeedata.data.beetlsql.dynamic.ext;
 
 import com.baomidou.dynamic.datasource.toolkit.DynamicDataSourceContextHolder;
 import org.beetl.sql.annotation.entity.TargetSQLManager;

@@ -1,4 +1,4 @@
-package com.qeedata.data.beetlsql.dynamic;
+package com.qeedata.data.beetlsql.dynamic.ext;
 
 import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;
 import org.beetl.sql.ext.spring.SpringConnectionSource;

@@ -1,5 +1,6 @@
-package com.qeedata.data.beetlsql.dynamic;
+package com.qeedata.data.beetlsql.dynamic.configure;
 
+import com.qeedata.data.beetlsql.dynamic.ext.DynamicConditionalSqlManager;
 import lombok.Data;
 import org.beetl.sql.clazz.kit.StringKit;
 import org.springframework.core.env.Environment;
@@ -33,6 +34,7 @@ public class BeetlSqlConfig {
     public static String PREFIX_DYNAMIC_CONDITION = ".dynamicCondition ";
     public static String PREFIX_DYNAMIC_SQLMANAGER = ".dynamicSqlManager";
     public static String PREFIX_DYNAMIC_CONNECTION_SOURCE = ".dynamicConnectionSource";
+    public static String PREFIX_DYNAMIC_DATASOURCE_PROVIDER = ".dynamicDatasourceProvider";
 
     private Environment env;
     private DynamicBeetlSqlProperties properties;
@@ -85,6 +87,7 @@ public class BeetlSqlConfig {
         property.setDynamicCondition(env.getProperty(prefix + PREFIX_DYNAMIC_CONDITION));
         property.setDynamicSqlManager(env.getProperty(prefix + PREFIX_DYNAMIC_SQLMANAGER));
         property.setDynamicConnectionSource(env.getProperty(prefix + PREFIX_DYNAMIC_CONNECTION_SOURCE));
+        property.setDynamicDatasourceProvider(env.getProperty(prefix + PREFIX_DYNAMIC_DATASOURCE_PROVIDER));
 
         return property;
     }
@@ -103,6 +106,7 @@ public class BeetlSqlConfig {
         String dynamicConnectionSource = getProperty(property.getDynamicConnectionSource(), defaultProperty.getDynamicConnectionSource());
         String dynamicSqlManager = getProperty(property.getDynamicSqlManager(), defaultProperty.getDynamicSqlManager());
         String dynamicCondition = getProperty(property.getDynamicCondition(), defaultProperty.getDynamicCondition());
+        String dynamicDatasourceProvider = getProperty(property.getDynamicDatasourceProvider(), defaultProperty.getDynamicDatasourceProvider());
         Boolean dev = getProperty(property.getDev(), defaultProperty.getDev());
 
         if(!StringKit.isEmpty(dynamicSqlManager)){
@@ -122,6 +126,7 @@ public class BeetlSqlConfig {
         prop.setDynamicSqlManager(dynamicSqlManager);
         prop.setDynamicConnectionSource(dynamicConnectionSource);
         prop.setDynamicCondition(dynamicCondition);
+        prop.setDynamicDatasourceProvider(dynamicDatasourceProvider);
         prop.setDev(dev);
 
         return prop;
