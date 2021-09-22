@@ -5,6 +5,7 @@ import com.qeedata.data.beetlsql.dynamic.configure.BeetlSqlProperty;
 import com.qeedata.data.beetlsql.dynamic.configure.DynamicBeetlSqlProperties;
 import com.qeedata.data.beetlsql.dynamic.ext.ConnectionSourceFactory;
 import com.qeedata.data.beetlsql.dynamic.ext.DynamicSqlManagerFactoryBean;
+import com.qeedata.data.beetlsql.dynamic.provider.DynamicConnectionSourceProvider;
 import org.beetl.core.fun.ObjectUtil;
 import org.beetl.sql.core.Interceptor;
 import org.beetl.sql.core.loader.MarkdownClasspathLoader;
@@ -79,7 +80,7 @@ public class BeetlSqlBeanRegister implements ImportBeanDefinitionRegistrar, Reso
 		final ClassLoader classLoader = getClassLoader();
 		beetlSqlPropertyMap.forEach((sqlManagerName, property) -> {
 			if (property.getDynamicConnectionSource() != null ||
-					property.getDynamicDatasourceProvider() != null) {
+					property.getDynamicConnectionSourceProvider() != null) {
 				// 支持 ConditionalConnectionSource  sqlManager
 				registerDynamicConnectionSourceSQLManager(sqlManagerName, property, classLoader);
 			} else if (property.getDynamicSqlManager() == null) {
@@ -122,8 +123,15 @@ public class BeetlSqlBeanRegister implements ImportBeanDefinitionRegistrar, Reso
 	 * ConditionalConnectionSource 方式，支持多数据库连接
 	 */
 	private void registerDynamicConnectionSourceSQLManager(String name, BeetlSqlProperty property, ClassLoader classLoader) {
-		String[] connectionSources = property.getDynamicConnectionSource() != null ?
-				property.getDynamicConnectionSource().split(",") : property.getDynamicDatasourceProvider().split(",");
+		String[] connectionSources = new String[0];
+		if (property.getDynamicConnectionSource() != null) {
+			connectionSources = property.getDynamicConnectionSource().split(",");
+		}
+		if (property.getDynamicConnectionSourceProvider() != null) {
+			String dynamicDatasourceProvider = property.getDynamicConnectionSourceProvider();
+			DynamicConnectionSourceProvider provider = (DynamicConnectionSourceProvider) ObjectUtil.tryInstance(dynamicDatasourceProvider, classLoader);
+			connectionSources = provider.getConnectionSources();
+		}
 		registerSQLManager(name, property, classLoader, connectionSources[0]);
 		// connectionSources 在 DynamicBeetlSqlAutoConfiguration 中用
 		// setConditionalConnectionSource 设置
@@ -141,7 +149,8 @@ public class BeetlSqlBeanRegister implements ImportBeanDefinitionRegistrar, Reso
 	 * 注册 sqlManager
 	 */
 	private BeanDefinitionBuilder registerSQLManager(String name, BeetlSqlProperty property, ClassLoader classLoader) {
-		return registerSQLManager(name, property, classLoader, name);
+		String csName = property.getDs();
+		return registerSQLManager(name, property, classLoader, csName);
 	}
 
 	/**

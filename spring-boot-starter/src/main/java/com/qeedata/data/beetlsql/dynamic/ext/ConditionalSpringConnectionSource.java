@@ -26,6 +26,9 @@ public class ConditionalSpringConnectionSource extends SpringConnectionSource {
     public ConditionalSpringConnectionSource(Policy policy, Map<String,SpringConnectionSource> all){
         this.all = all;
         String defaultName = policy.getMasterName();
+        if (defaultName == null) {
+            defaultName = this.all.keySet().toArray()[0].toString();
+        }
         defaultCs = all.get(defaultName);
         if(defaultCs==null){
             throw new IllegalArgumentException("根据 "+defaultName+" 找不到对应的ConnectionSource");
@@ -55,6 +58,6 @@ public class ConditionalSpringConnectionSource extends SpringConnectionSource {
 
     public interface Policy{
         String getConnectionSourceName(ExecuteContext ctx, boolean isUpdate);
-        String getMasterName();
+        default String getMasterName() {return null;};
     }
 }

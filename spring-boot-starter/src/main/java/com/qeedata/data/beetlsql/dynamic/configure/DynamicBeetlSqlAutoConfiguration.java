@@ -1,14 +1,13 @@
 package com.qeedata.data.beetlsql.dynamic.configure;
 
-import com.baomidou.dynamic.datasource.DynamicRoutingDataSource;
 import com.baomidou.dynamic.datasource.creator.DefaultDataSourceCreator;
-import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DataSourceProperty;
 import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DynamicDataSourceAutoConfiguration;
 import com.baomidou.dynamic.datasource.toolkit.DynamicDataSourceContextHolder;
 import com.qeedata.data.beetlsql.dynamic.*;
 import com.qeedata.data.beetlsql.dynamic.ext.ConditionalSpringConnectionSource;
 import com.qeedata.data.beetlsql.dynamic.ext.DynamicDataSourceTransactionManager;
-import com.qeedata.data.beetlsql.dynamic.provider.DynamicDatasourceConfigProvider;
+import com.qeedata.data.beetlsql.dynamic.provider.DynamicConnectionSourceProvider;
+import org.beetl.core.fun.ObjectUtil;
 import org.beetl.sql.core.ExecuteContext;
 import org.beetl.sql.core.SQLManager;
 import org.beetl.sql.ext.spring.SpringConnectionSource;
@@ -42,9 +41,6 @@ public class DynamicBeetlSqlAutoConfiguration {
 	@Autowired(required=false)
 	private SqlManagerCustomize cust;
 
-	@Autowired(required=false)
-	private DynamicDatasourceConfigProvider dynamicDatasourceConfigProvider;
-
 	@Autowired
 	private DataSource dataSource;
 
@@ -66,7 +62,7 @@ public class DynamicBeetlSqlAutoConfiguration {
 			String name = item.getKey();
 			BeetlSqlProperty property = beetlSqlPropertyMap.get(name);
 			if(property.getDynamicConnectionSource() != null ||
-				property.getDynamicDatasourceProvider() != null) {
+				property.getDynamicConnectionSourceProvider() != null) {
 				setConditionalConnectionSource(name, property);
 			}
 		}
@@ -77,27 +73,14 @@ public class DynamicBeetlSqlAutoConfiguration {
 				cust.customize(name,sqlManager);
 			}
 		}
-
 	}
 
-	/**
-	 * 装载动态数据源 dataSource
-	 */
-	private String[] loadDynamicDatasource(String sqlManagerName, String param) {
-		if (dynamicDatasourceConfigProvider != null) {
-			List<String> dsNames = new ArrayList<>();
-			SQLManager sqlManager = applicationContext.getBean(sqlManagerName, SQLManager.class);
-			DynamicRoutingDataSource ds = (DynamicRoutingDataSource)dataSource;
-			Map<String, DataSourceProperty> dataSourcePropertyMap = dynamicDatasourceConfigProvider.getDataSourcePropertyMap(sqlManager, param);
-			for (Map.Entry<String, DataSourceProperty> item : dataSourcePropertyMap.entrySet()) {
-				DataSourceProperty dataSourceProperty = item.getValue();
-				DataSource dsNew = dataSourceCreator.createDataSource(dataSourceProperty);
-				ds.addDataSource(item.getKey(), dsNew);
-				dsNames.add(item.getKey());
-			}
-			return dsNames.toArray(new String[0]);
+	private  ClassLoader  getClassLoader(){
+		ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+		if(classLoader == null) {
+			classLoader = this.getClass().getClassLoader();
 		}
-		return null;
+		return classLoader;
 	}
 
 	/**
@@ -107,18 +90,17 @@ public class DynamicBeetlSqlAutoConfiguration {
 		BeetlSqlBeanRegister beanRegister = new BeetlSqlBeanRegister();
 
 		String[] connectionSources;
-		// 如果是 dynamicDataSourceProvider 则从 dynamicDatasourceConfigProvider 取数据源
+		// 如果是 dynamicConnectionSourceProvider
 		// 用于如从数据表中定义数据源的场景
-		if (property.getDynamicDatasourceProvider() != null) {
-			String[] items = property.getDynamicDatasourceProvider().split(",");
-			String sqlManagerName = items[0];
-			String param = null;
-			if (items.length > 1) {
-				List<String> values = new ArrayList<>(Arrays.asList(items));
-				values.remove(0);
-				param = String.join(",", values);
+		if (property.getDynamicConnectionSourceProvider() != null) {
+			DynamicConnectionSourceProvider provider = null;
+			String dynamicConnectionSourceProvider = property.getDynamicConnectionSourceProvider();
+			if (applicationContext.containsBean(dynamicConnectionSourceProvider)) {
+				provider = applicationContext.getBean(dynamicConnectionSourceProvider, DynamicConnectionSourceProvider.class);
+			} else {
+				provider = (DynamicConnectionSourceProvider) ObjectUtil.tryInstance(dynamicConnectionSourceProvider, getClassLoader());
 			}
-			connectionSources = loadDynamicDatasource(sqlManagerName, param);
+			connectionSources = provider.getConnectionSources();
 		} else {
 			connectionSources = property.getDynamicConnectionSource().split(",");
 		}
@@ -137,25 +119,35 @@ public class DynamicBeetlSqlAutoConfiguration {
 		}
 
 		// 配置策略
-		ConditionalSpringConnectionSource.Policy policy = new ConditionalSpringConnectionSource.Policy() {
-			final String defaultCsName = connectionSources[0];
+		ConditionalSpringConnectionSource.Policy policy;
+		if (property.getDynamicConnectionPolicy() != null) {
+			String dynamicConnectionPolicy = property.getDynamicConnectionPolicy();
+			if (applicationContext.containsBean(dynamicConnectionPolicy)) {
+				policy = applicationContext.getBean(dynamicConnectionPolicy, ConditionalSpringConnectionSource.Policy.class);
+			} else {
+				policy = (ConditionalSpringConnectionSource.Policy) ObjectUtil.tryInstance(dynamicConnectionPolicy, getClassLoader());
+			}
+		} else {
+			policy = new ConditionalSpringConnectionSource.Policy() {
+				final String defaultCsName = connectionSources[0];
 
-			@Override
-			public String getConnectionSourceName(ExecuteContext ctx, boolean isUpdate) {
-				// 按当前数据源
-				String csName = DynamicDataSourceContextHolder.peek();
-				if (!StringUtils.isEmpty(csName)) {
-					return csName;
-				} else {
+				@Override
+				public String getConnectionSourceName(ExecuteContext ctx, boolean isUpdate) {
+					// 按当前数据源
+					String csName = DynamicDataSourceContextHolder.peek();
+					if (!StringUtils.isEmpty(csName)) {
+						return csName;
+					} else {
+						return defaultCsName;
+					}
+				}
+
+				@Override
+				public String getMasterName() {
 					return defaultCsName;
 				}
-			}
-
-			@Override
-			public String getMasterName() {
-				return defaultCsName;
-			}
-		};
+			};
+		}
 
 		ConditionalSpringConnectionSource cs  = new ConditionalSpringConnectionSource(policy, connectionSourceMap);
 

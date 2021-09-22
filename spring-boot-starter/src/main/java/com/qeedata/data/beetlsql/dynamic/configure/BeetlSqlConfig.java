@@ -34,7 +34,8 @@ public class BeetlSqlConfig {
     public static String PREFIX_DYNAMIC_CONDITION = ".dynamicCondition ";
     public static String PREFIX_DYNAMIC_SQLMANAGER = ".dynamicSqlManager";
     public static String PREFIX_DYNAMIC_CONNECTION_SOURCE = ".dynamicConnectionSource";
-    public static String PREFIX_DYNAMIC_DATASOURCE_PROVIDER = ".dynamicDatasourceProvider";
+    public static String PREFIX_DYNAMIC_CONNECTION_POLICY = ".dynamicConnectionPolicy";
+    public static String PREFIX_DYNAMIC_CONNECTION_SOURCE_PROVIDER = ".dynamicConnectionSourceProvider";
 
     private Environment env;
     private DynamicBeetlSqlProperties properties;
@@ -87,7 +88,8 @@ public class BeetlSqlConfig {
         property.setDynamicCondition(env.getProperty(prefix + PREFIX_DYNAMIC_CONDITION));
         property.setDynamicSqlManager(env.getProperty(prefix + PREFIX_DYNAMIC_SQLMANAGER));
         property.setDynamicConnectionSource(env.getProperty(prefix + PREFIX_DYNAMIC_CONNECTION_SOURCE));
-        property.setDynamicDatasourceProvider(env.getProperty(prefix + PREFIX_DYNAMIC_DATASOURCE_PROVIDER));
+        property.setDynamicConnectionPolicy(env.getProperty(prefix + PREFIX_DYNAMIC_CONNECTION_POLICY));
+        property.setDynamicConnectionSourceProvider(env.getProperty(prefix + PREFIX_DYNAMIC_CONNECTION_SOURCE_PROVIDER));
 
         return property;
     }
@@ -106,7 +108,8 @@ public class BeetlSqlConfig {
         String dynamicConnectionSource = getProperty(property.getDynamicConnectionSource(), defaultProperty.getDynamicConnectionSource());
         String dynamicSqlManager = getProperty(property.getDynamicSqlManager(), defaultProperty.getDynamicSqlManager());
         String dynamicCondition = getProperty(property.getDynamicCondition(), defaultProperty.getDynamicCondition());
-        String dynamicDatasourceProvider = getProperty(property.getDynamicDatasourceProvider(), defaultProperty.getDynamicDatasourceProvider());
+        String dynamicConnectionSourceProvider = getProperty(property.getDynamicConnectionSourceProvider(), defaultProperty.getDynamicConnectionSourceProvider());
+        String dynamicConnectionPolicy = getProperty(property.getDynamicConnectionPolicy(), defaultProperty.getDynamicConnectionPolicy());
         Boolean dev = getProperty(property.getDev(), defaultProperty.getDev());
 
         if(!StringKit.isEmpty(dynamicSqlManager)){
@@ -126,7 +129,8 @@ public class BeetlSqlConfig {
         prop.setDynamicSqlManager(dynamicSqlManager);
         prop.setDynamicConnectionSource(dynamicConnectionSource);
         prop.setDynamicCondition(dynamicCondition);
-        prop.setDynamicDatasourceProvider(dynamicDatasourceProvider);
+        prop.setDynamicConnectionPolicy(dynamicConnectionPolicy);
+        prop.setDynamicConnectionSourceProvider(dynamicConnectionSourceProvider);
         prop.setDev(dev);
 
         return prop;

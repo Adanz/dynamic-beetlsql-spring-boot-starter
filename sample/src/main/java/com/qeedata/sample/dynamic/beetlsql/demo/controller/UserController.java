@@ -20,6 +20,11 @@ public class UserController {
         return userService.getUserList();
     }
 
+    @GetMapping("users2")
+    public List getUserList2() {
+        return userService.getUserList2();
+    }
+
     @GetMapping("update")
     public void updateUser() {
         userService.updateUser();

@@ -65,7 +65,12 @@ public class BeetlSqlProperty {
   private  String dynamicConnectionSource;
 
   /**
-   * dynamicDataSourceProvider
+   * dynamicConnectionPolicy
    */
-  private  String dynamicDatasourceProvider;
+  private  String dynamicConnectionPolicy;
+
+  /**
+   * dynamicConnectionSourceProvider
+   */
+  private  String dynamicConnectionSourceProvider;
 }

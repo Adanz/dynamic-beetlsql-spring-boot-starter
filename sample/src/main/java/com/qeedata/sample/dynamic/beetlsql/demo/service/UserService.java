@@ -6,6 +6,7 @@ import org.beetl.sql.core.SqlId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +21,7 @@ import java.util.Map;
  * @author adanz
  */
 @Service
+@Lazy
 public class UserService  {
     @Autowired
     private ApplicationContext applicationContext;
@@ -45,6 +47,10 @@ public class UserService  {
     @Qualifier("sm")
     private SQLManager smManager;
 
+    @Autowired
+    @Qualifier("ccs")
+    private SQLManager ccsManager;
+
     /**
      * 使用 Dynamic Datasource 注解切换
      */
@@ -56,8 +62,15 @@ public class UserService  {
         /// List<?> rows1 = sqlManager1.select(sqlId, Map.class, null);
         /// List<?> rows2 = sqlManager2.select(SqlId.of("demo.getUser"), Map.class, null);
 
-        List<?> rows = smManager.select(sqlId, Map.class, null);
+        List<?> rows = csManager.select(sqlId, Map.class, null);
 
+        return rows;
+    }
+
+    @DS("ds3")
+    public List getUserList2() {
+        SqlId sqlId = SqlId.of("demo", "getUser");
+        List<?> rows = ccsManager.select(sqlId, Map.class, null);
         return rows;
     }
 
