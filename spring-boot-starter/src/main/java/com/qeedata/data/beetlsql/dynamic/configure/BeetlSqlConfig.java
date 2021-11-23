@@ -4,6 +4,7 @@ import com.qeedata.data.beetlsql.dynamic.ext.DynamicConditionalSqlManager;
 import lombok.Data;
 import org.beetl.sql.clazz.kit.StringKit;
 import org.springframework.core.env.Environment;
+import org.springframework.util.StringUtils;
 
 import java.nio.charset.Charset;
 import java.util.Arrays;
@@ -18,24 +19,28 @@ import java.util.Map;
 @Data
 public class BeetlSqlConfig {
     public static final String PREFIX_BEETLSQL = "dynamic.beetlsql";
-    public static String PREFIX_DEFAULT = PREFIX_BEETLSQL + "._default";
-    public static String PREFIX_SQL_MANAGERS = PREFIX_BEETLSQL + ".sqlManagers";
-    public static String PREFIX_PRIMARY = PREFIX_BEETLSQL + ".primary";
+    public static final String PREFIX_DEFAULT = PREFIX_BEETLSQL + "._default";
+    public static final String PREFIX_SQL_MANAGERS = PREFIX_BEETLSQL + ".sqlManagers";
+    public static final String PREFIX_PRIMARY = PREFIX_BEETLSQL + ".primary";
 
-    public static String PREFIX_DATASOURCE = ".ds";
-    public static String PREFIX_BASE_PACKAGE = ".basePackage";
-    public static String PREFIX_DAO_SUFFIX = ".daoSuffix";
-    public static String PREFIX_SQL_PATH = ".sqlPath";
-    public static String PREFIX_SQL_FILE_CHARSET = ".sqlFileCharset";
-    public static String PREFIX_NAME_CONVERSION = ".nameConversion";
-    public static String PREFIX_DB_STYLE = ".dbStyle";
-    public static String PREFIX_DEV = ".dev";
-    public static String PREFIX_SLAVE = ".slave";
-    public static String PREFIX_DYNAMIC_CONDITION = ".dynamicCondition ";
-    public static String PREFIX_DYNAMIC_SQLMANAGER = ".dynamicSqlManager";
-    public static String PREFIX_DYNAMIC_CONNECTION_SOURCE = ".dynamicConnectionSource";
-    public static String PREFIX_DYNAMIC_CONNECTION_POLICY = ".dynamicConnectionPolicy";
-    public static String PREFIX_DYNAMIC_CONNECTION_SOURCE_PROVIDER = ".dynamicConnectionSourceProvider";
+    public static final String PREFIX_DATASOURCE = ".ds";
+    public static final String PREFIX_BASE_PACKAGE = ".basePackage";
+    public static final String PREFIX_DAO_SUFFIX = ".daoSuffix";
+    public static final String PREFIX_SQL_PATH = ".sqlPath";
+    public static final String PREFIX_SQL_FILE_CHARSET = ".sqlFileCharset";
+    public static final String PREFIX_NAME_CONVERSION = ".nameConversion";
+    public static final String PREFIX_DB_STYLE = ".dbStyle";
+    public static final String PREFIX_DEV = ".dev";
+    public static final String PREFIX_SLAVE = ".slave";
+    public static final String PREFIX_DYNAMIC_CONDITION = ".dynamicCondition ";
+    public static final String PREFIX_DYNAMIC_SQLMANAGER = ".dynamicSqlManager";
+    public static final String PREFIX_DYNAMIC_CONNECTION_SOURCE = ".dynamicConnectionSource";
+    public static final String PREFIX_DYNAMIC_CONNECTION_POLICY = ".dynamicConnectionPolicy";
+    public static final String PREFIX_DYNAMIC_CONNECTION_SOURCE_PROVIDER = ".dynamicConnectionSourceProvider";
+    public static final String PREFIX_DYNAMIC_CONNECTION_SOURCE_GROUP = ".dynamicConnectionSourceGroup";
+
+    public static final String DEFAULT_GROUP_CONNECTION_SOURCE_PROVIDER = "com.qeedata.data.tenant.group.DefaultConnectionSourceGroup";
+    public static final String DEFAULT_GROUP_CONNECTION_POLICY = "com.qeedata.data.tenant.group.DefaultConnectionSourceGroup";
 
     private Environment env;
     private DynamicBeetlSqlProperties properties;
@@ -88,8 +93,23 @@ public class BeetlSqlConfig {
         property.setDynamicCondition(env.getProperty(prefix + PREFIX_DYNAMIC_CONDITION));
         property.setDynamicSqlManager(env.getProperty(prefix + PREFIX_DYNAMIC_SQLMANAGER));
         property.setDynamicConnectionSource(env.getProperty(prefix + PREFIX_DYNAMIC_CONNECTION_SOURCE));
-        property.setDynamicConnectionPolicy(env.getProperty(prefix + PREFIX_DYNAMIC_CONNECTION_POLICY));
-        property.setDynamicConnectionSourceProvider(env.getProperty(prefix + PREFIX_DYNAMIC_CONNECTION_SOURCE_PROVIDER));
+
+        String dynamicConnectionPolicy = env.getProperty(prefix + PREFIX_DYNAMIC_CONNECTION_POLICY);
+        String dynamicConnectionSourceProvider = env.getProperty(prefix + PREFIX_DYNAMIC_CONNECTION_SOURCE_PROVIDER);
+        String dynamicConnectionSourceGroup = env.getProperty(prefix + PREFIX_DYNAMIC_CONNECTION_SOURCE_GROUP);
+
+        if (!StringUtils.isEmpty(dynamicConnectionSourceGroup)) {
+            if (StringUtils.isEmpty(dynamicConnectionPolicy)) {
+                dynamicConnectionPolicy = DEFAULT_GROUP_CONNECTION_POLICY;
+            }
+            if (StringUtils.isEmpty(dynamicConnectionSourceProvider)) {
+                dynamicConnectionSourceProvider = DEFAULT_GROUP_CONNECTION_SOURCE_PROVIDER;
+            }
+        }
+
+        property.setDynamicConnectionPolicy(dynamicConnectionPolicy);
+        property.setDynamicConnectionSourceProvider(dynamicConnectionSourceProvider);
+        property.setDynamicConnectionSourceGroup(dynamicConnectionSourceGroup);
 
         return property;
     }
@@ -111,6 +131,7 @@ public class BeetlSqlConfig {
         String dynamicConnectionSourceProvider = getProperty(property.getDynamicConnectionSourceProvider(), defaultProperty.getDynamicConnectionSourceProvider());
         String dynamicConnectionPolicy = getProperty(property.getDynamicConnectionPolicy(), defaultProperty.getDynamicConnectionPolicy());
         Boolean dev = getProperty(property.getDev(), defaultProperty.getDev());
+        String dynamicConnectionSourceGroup = getProperty(property.getDynamicConnectionSourceGroup(), defaultProperty.getDynamicConnectionSourceGroup());
 
         if(!StringKit.isEmpty(dynamicSqlManager)){
             if(StringKit.isEmpty(dynamicCondition)){
@@ -131,6 +152,7 @@ public class BeetlSqlConfig {
         prop.setDynamicCondition(dynamicCondition);
         prop.setDynamicConnectionPolicy(dynamicConnectionPolicy);
         prop.setDynamicConnectionSourceProvider(dynamicConnectionSourceProvider);
+        prop.setDynamicConnectionSourceGroup(dynamicConnectionSourceGroup);
         prop.setDev(dev);
 
         return prop;

@@ -6,6 +6,7 @@ import com.baomidou.dynamic.datasource.toolkit.DynamicDataSourceContextHolder;
 import com.qeedata.data.beetlsql.dynamic.*;
 import com.qeedata.data.beetlsql.dynamic.ext.ConditionalSpringConnectionSource;
 import com.qeedata.data.beetlsql.dynamic.ext.DynamicDataSourceTransactionManager;
+import com.qeedata.data.beetlsql.dynamic.group.DynamicConnectionSourceGroup;
 import com.qeedata.data.beetlsql.dynamic.provider.DynamicConnectionSourceProvider;
 import org.beetl.core.fun.ObjectUtil;
 import org.beetl.sql.core.ExecuteContext;
@@ -89,18 +90,29 @@ public class DynamicBeetlSqlAutoConfiguration {
 	private void setConditionalConnectionSource(String name, BeetlSqlProperty property) {
 		BeetlSqlBeanRegister beanRegister = new BeetlSqlBeanRegister();
 
-		String[] connectionSources;
+		String[] connectionSources = new String[0];
 		// 如果是 dynamicConnectionSourceProvider
 		// 用于如从数据表中定义数据源的场景
-		if (property.getDynamicConnectionSourceProvider() != null) {
-			DynamicConnectionSourceProvider provider = null;
-			String dynamicConnectionSourceProvider = property.getDynamicConnectionSourceProvider();
-			if (applicationContext.containsBean(dynamicConnectionSourceProvider)) {
-				provider = applicationContext.getBean(dynamicConnectionSourceProvider, DynamicConnectionSourceProvider.class);
-			} else {
-				provider = (DynamicConnectionSourceProvider) ObjectUtil.tryInstance(dynamicConnectionSourceProvider, getClassLoader());
+		if (property.getDynamicConnectionSourceProvider() != null && property.getDynamicConnectionSourceGroup() != null) {
+			String[] groupCodes = property.getDynamicConnectionSourceGroup().split(",");
+			String dynamicDatasourceProvider = property.getDynamicConnectionSourceProvider();
+			Object instance = ObjectUtil.tryInstance(dynamicDatasourceProvider, getClassLoader());
+			try {
+				DynamicConnectionSourceGroup connectionSourceGroup = (DynamicConnectionSourceGroup) instance;
+				connectionSourceGroup.setGroupCodes(groupCodes);
+				DynamicConnectionSourceProvider provider = (DynamicConnectionSourceProvider) instance;
+				connectionSources = provider.getConnectionSources();
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-			connectionSources = provider.getConnectionSources();
+		} else if (property.getDynamicConnectionSourceProvider() != null) {
+			String dynamicConnectionSourceProvider = property.getDynamicConnectionSourceProvider();
+			try {
+				DynamicConnectionSourceProvider provider = (DynamicConnectionSourceProvider) ObjectUtil.tryInstance(dynamicConnectionSourceProvider, getClassLoader());
+				connectionSources = provider.getConnectionSources();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		} else {
 			connectionSources = property.getDynamicConnectionSource().split(",");
 		}
@@ -119,17 +131,29 @@ public class DynamicBeetlSqlAutoConfiguration {
 		}
 
 		// 配置策略
-		ConditionalSpringConnectionSource.Policy policy;
-		if (property.getDynamicConnectionPolicy() != null) {
+		ConditionalSpringConnectionSource.Policy policy = null;
+		if (property.getDynamicConnectionPolicy() != null && property.getDynamicConnectionSourceGroup() != null) {
+			String[] groupCodes = property.getDynamicConnectionSourceGroup().split(",");
 			String dynamicConnectionPolicy = property.getDynamicConnectionPolicy();
-			if (applicationContext.containsBean(dynamicConnectionPolicy)) {
-				policy = applicationContext.getBean(dynamicConnectionPolicy, ConditionalSpringConnectionSource.Policy.class);
-			} else {
+			Object instance = ObjectUtil.tryInstance(dynamicConnectionPolicy, getClassLoader());
+			try {
+				DynamicConnectionSourceGroup connectionSourceGroup = (DynamicConnectionSourceGroup) instance;
+				connectionSourceGroup.setGroupCodes(groupCodes);
+				policy = (ConditionalSpringConnectionSource.Policy) instance;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (property.getDynamicConnectionPolicy() != null) {
+			String dynamicConnectionPolicy = property.getDynamicConnectionPolicy();
+			try {
 				policy = (ConditionalSpringConnectionSource.Policy) ObjectUtil.tryInstance(dynamicConnectionPolicy, getClassLoader());
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
 		} else {
+			String[] finalConnectionSources = connectionSources;
 			policy = new ConditionalSpringConnectionSource.Policy() {
-				final String defaultCsName = connectionSources[0];
+				final String defaultCsName = finalConnectionSources[0];
 
 				@Override
 				public String getConnectionSourceName(ExecuteContext ctx, boolean isUpdate) {

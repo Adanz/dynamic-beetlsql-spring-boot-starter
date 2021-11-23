@@ -1,2 +1,6 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.qeedata.data.beetlsql.dynamic.configure.DynamicBeetlSqlAutoConfiguration
+com.qeedata.data.beetlsql.dynamic.configure.DynamicBeetlSqlAutoConfiguration,\
+com.qeedata.data.tenant.configuration.DynamicDatasourceConfig,\
+com.qeedata.data.tenant.configuration.TenantDsConfig
+org.springframework.context.ApplicationListener=\
+com.qeedata.data.tenant.listener.TenantInitListener

@@ -73,4 +73,9 @@ public class BeetlSqlProperty {
    * dynamicConnectionSourceProvider
    */
   private  String dynamicConnectionSourceProvider;
+
+  /**
+   * dynamicConnectionSourceGroup
+   */
+  private  String dynamicConnectionSourceGroup;
 }

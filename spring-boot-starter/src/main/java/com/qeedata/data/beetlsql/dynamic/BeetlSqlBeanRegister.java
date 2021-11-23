@@ -5,6 +5,7 @@ import com.qeedata.data.beetlsql.dynamic.configure.BeetlSqlProperty;
 import com.qeedata.data.beetlsql.dynamic.configure.DynamicBeetlSqlProperties;
 import com.qeedata.data.beetlsql.dynamic.ext.ConnectionSourceFactory;
 import com.qeedata.data.beetlsql.dynamic.ext.DynamicSqlManagerFactoryBean;
+import com.qeedata.data.beetlsql.dynamic.group.DynamicConnectionSourceGroup;
 import com.qeedata.data.beetlsql.dynamic.provider.DynamicConnectionSourceProvider;
 import org.beetl.core.fun.ObjectUtil;
 import org.beetl.sql.core.Interceptor;
@@ -124,14 +125,33 @@ public class BeetlSqlBeanRegister implements ImportBeanDefinitionRegistrar, Reso
 	 */
 	private void registerDynamicConnectionSourceSQLManager(String name, BeetlSqlProperty property, ClassLoader classLoader) {
 		String[] connectionSources = new String[0];
-		if (property.getDynamicConnectionSource() != null) {
+
+		if (property.getDynamicConnectionSourceProvider() != null && property.getDynamicConnectionSourceGroup() != null ) {
+			String[] groupCodes = property.getDynamicConnectionSourceGroup().split(",");
+			String dynamicDatasourceProvider = property.getDynamicConnectionSourceProvider();
+			Object instance = ObjectUtil.tryInstance(dynamicDatasourceProvider, classLoader);
+			try {
+				DynamicConnectionSourceGroup connectionSourceGroup = (DynamicConnectionSourceGroup) instance;
+				connectionSourceGroup.setGroupCodes(groupCodes);
+				DynamicConnectionSourceProvider provider = (DynamicConnectionSourceProvider) instance;
+				connectionSources = provider.getConnectionSources();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (property.getDynamicConnectionSourceProvider() != null) {
+			String dynamicDatasourceProvider = property.getDynamicConnectionSourceProvider();
+			try {
+				DynamicConnectionSourceProvider provider = (DynamicConnectionSourceProvider) ObjectUtil.tryInstance(dynamicDatasourceProvider, classLoader);
+				connectionSources = provider.getConnectionSources();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+
+		} else {
+			// if (property.getDynamicConnectionSource() != null)
 			connectionSources = property.getDynamicConnectionSource().split(",");
 		}
-		if (property.getDynamicConnectionSourceProvider() != null) {
-			String dynamicDatasourceProvider = property.getDynamicConnectionSourceProvider();
-			DynamicConnectionSourceProvider provider = (DynamicConnectionSourceProvider) ObjectUtil.tryInstance(dynamicDatasourceProvider, classLoader);
-			connectionSources = provider.getConnectionSources();
-		}
+
 		registerSQLManager(name, property, classLoader, connectionSources[0]);
 		// connectionSources 在 DynamicBeetlSqlAutoConfiguration 中用
 		// setConditionalConnectionSource 设置
