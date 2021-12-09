@@ -8,15 +8,15 @@ import org.springframework.util.StringUtils;
 /**
  * 根据当前租户和数据源组名称进行切换数据源
  * @author adanz
- * @date 2020-03-31
+ * @date 2021-11-30
  */
-public class DsTenantProcessor extends DsProcessor {
+public class DsGroupProcessor extends DsProcessor {
 
     /**
-     * tenant ds prefix
-     * 例: @DS("#tenantDS.slave")
+     * group ds prefix
+     * 例: @DS(#group.sales), @DS("#group.order")
      */
-    private static final String HEADER_PREFIX = "#tenantDS";
+    private static final String HEADER_PREFIX = "#group";
 
     @Override
     public boolean matches(String key) {
@@ -25,7 +25,7 @@ public class DsTenantProcessor extends DsProcessor {
 
     @Override
     public String doDetermineDatasource(MethodInvocation invocation, String key) {
-        String s = key.substring(10);
+        String s = key.substring(7);
         if (StringUtils.isEmpty(s)) {
             s = "master";
         }
