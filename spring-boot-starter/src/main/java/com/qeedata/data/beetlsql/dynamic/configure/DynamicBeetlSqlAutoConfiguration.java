@@ -5,7 +5,7 @@ import com.baomidou.dynamic.datasource.spring.boot.autoconfigure.DynamicDataSour
 import com.baomidou.dynamic.datasource.toolkit.DynamicDataSourceContextHolder;
 import com.qeedata.data.beetlsql.dynamic.*;
 import com.qeedata.data.beetlsql.dynamic.ext.ConditionalSpringConnectionSource;
-import com.qeedata.data.beetlsql.dynamic.ext.DynamicDataSourceTransactionManager;
+import com.qeedata.data.beetlsql.dynamic.transaction.DynamicDataSourceTransactionManager;
 import com.qeedata.data.beetlsql.dynamic.group.DynamicConnectionSourceGroup;
 import com.qeedata.data.beetlsql.dynamic.provider.DynamicConnectionSourceProvider;
 import org.beetl.core.fun.ObjectUtil;
@@ -14,6 +14,7 @@ import org.beetl.sql.core.SQLManager;
 import org.beetl.sql.ext.spring.SpringConnectionSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -182,7 +183,7 @@ public class DynamicBeetlSqlAutoConfiguration {
 
 	@Primary
 	@Bean
-	@ConditionalOnProperty(prefix = BeetlSqlConfig.PREFIX_BEETLSQL, name = "transactionManager", havingValue = "true", matchIfMissing = true)
+	@ConditionalOnMissingBean
 	public PlatformTransactionManager txDynamicManager(DataSource datasource) {
 		DataSourceTransactionManager transactionManager = new DynamicDataSourceTransactionManager();
 		transactionManager.setDataSource(datasource);

@@ -34,7 +34,7 @@ public class TenantInitListener implements ApplicationListener<ApplicationContex
 
         ConfigurableEnvironment environment = applicationContextInitializedEvent.getApplicationContext().getEnvironment();
         String initClassName = environment.getProperty(MULTI_TENANT_INIT_CLASS, "");
-        boolean enable = Boolean.parseBoolean(environment.getProperty(MULTI_TENANT_ENABLE, "true"));
+        boolean enable = Boolean.parseBoolean(environment.getProperty(MULTI_TENANT_ENABLE, "false"));
 
         TenantContext.setEnable(enable);
 
