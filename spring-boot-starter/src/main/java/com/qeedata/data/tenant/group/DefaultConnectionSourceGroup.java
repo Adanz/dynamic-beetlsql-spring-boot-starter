@@ -13,7 +13,7 @@ import org.springframework.util.StringUtils;
  *  DynamicConnectionSourceProvider, ConditionalSpringConnectionSource, DynamicConnectionSourceGroup
  *
  * @author adanz
- * @date 2020-09-31
+ * @since 2020-09-31
  */
 public class DefaultConnectionSourceGroup
         implements DynamicConnectionSourceGroup, DynamicConnectionSourceProvider, ConditionalSpringConnectionSource.Policy {

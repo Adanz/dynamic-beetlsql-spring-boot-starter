@@ -5,7 +5,7 @@ import lombok.Data;
 /**
  * 数据源配置
  * @author adanz
- * @date 2020-09-31
+ * @since 2020-09-31
  */
 @Data
 public class DatasourceConfig {

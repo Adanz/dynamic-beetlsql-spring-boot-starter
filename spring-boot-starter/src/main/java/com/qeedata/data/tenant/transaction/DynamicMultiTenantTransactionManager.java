@@ -10,8 +10,8 @@ import org.springframework.util.StringUtils;
 import javax.sql.DataSource;
 
 /**
- * DefaultGroupTransactionManager
-  * 事务处理中,通过 DynamicDataSourceTransactionManager 使得
+ * DynamicMultiTenantTransactionManager
+ * 事务处理中,通过 DynamicMultiTenantTransactionManager 使得
  * 同线程中获取的连接 Connection 或 DataSource一致
  *
  * @author adanz

@@ -15,7 +15,7 @@ import org.springframework.util.StringUtils;
 /**
  * 租户数据源信息初始化
  * @author adanz
- * @date 2020-09-31
+ * @since 2020-09-31
  */
 @Configuration
 public class TenantInitListener implements ApplicationListener<ApplicationContextInitializedEvent>, Ordered {

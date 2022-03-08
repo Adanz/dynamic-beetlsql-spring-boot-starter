@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * 配置 spring-dynamic-datasource 数据源
  * @author adanz
- * @date 2021-09-10
+ * @since 2021-09-10
  */
 @Configuration
 @ConditionalOnProperty(prefix = TenantInitListener.MULTI_TENANT_PREFIX, name = {"enable"}, havingValue = "true", matchIfMissing = false)

@@ -9,7 +9,7 @@ import org.springframework.util.StringUtils;
 /**
  * 缺省实现的租户数据源切换策略
  * @author adanz
- * @date 2020-09-31
+ * @since 2020-09-31
  */
 public class DefaultConnectionSourcePolicy implements ConditionalSpringConnectionSource.Policy {
     @Override

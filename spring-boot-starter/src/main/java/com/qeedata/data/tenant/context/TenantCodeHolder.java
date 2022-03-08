@@ -3,7 +3,7 @@ package com.qeedata.data.tenant.context;
 /**
  * 保存租户代码
  * @author adanz
- * @date 2020-09-31
+ * @since 2020-09-31
  */
 public class TenantCodeHolder {
     private static final ThreadLocal<String> TENANT_CODE_HOLDER = new InheritableThreadLocal<>();

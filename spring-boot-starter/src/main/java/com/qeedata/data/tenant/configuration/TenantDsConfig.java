@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Configuration;
 /**
  * 扩展 @DS 注解 DsTenantProcessor
  * @author adanz
- * @date 2020-03-31
+ * @since 2020-03-31
  */
 @Configuration
 @AutoConfigureBefore({DynamicDataSourceAutoConfiguration.class})

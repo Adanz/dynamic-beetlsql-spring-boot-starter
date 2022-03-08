@@ -1,4 +1,4 @@
-package com.qeedata.sample.dynamic.beetlsql;
+package com.qeedata.sample.tenant;
 
 
 import org.springframework.boot.SpringApplication;
