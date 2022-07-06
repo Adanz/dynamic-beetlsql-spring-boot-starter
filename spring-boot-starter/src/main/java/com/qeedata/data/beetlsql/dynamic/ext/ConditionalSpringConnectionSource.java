@@ -37,12 +37,14 @@ public class ConditionalSpringConnectionSource extends SpringConnectionSource {
     }
     @Override
     public Connection getMasterConn() {
-        return defaultCs.getMasterConn();
+        // return defaultCs.getMasterConn();
+        // 根据策略取连接 2022-03-17
+        return this.getConn(null, true);
     }
 
     @Override
     public Connection getMetaData() {
-        return getMasterConn();
+        return defaultCs.getMasterConn();
     }
 
     @Override

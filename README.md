@@ -35,6 +35,6 @@ dynamic-beetlsql-spring-boot-starter 的主要功能是整合 [dynamic-datasourc
 ## [使用文档](http://qeedata.com/open/dynamic-beetlsql/introduction/)
 
 ## 最后更新
-### v1.3.0 (2022-01-21)
-1. 增加多租户支持。
+### v1.3.1 (2022-03-21)
+1. fix getMasterConn() support policy。
 ---
